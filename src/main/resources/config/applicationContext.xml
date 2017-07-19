@@ -14,5 +14,4 @@
 	<bean id="cacheScheduledThreadPoolUtil" class="pers.cly.cache_queue.task.pool.impl.CacheScheduledThreadPoolUtil"/>
 	<!--缓存容器-->
 	<bean id="userEntityCache" class="pers.cly.cache_queue.container.impl.UserEntityCache"/>
-	<!---->
 </beans>
