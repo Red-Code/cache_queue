@@ -43,7 +43,11 @@ public abstract class CacheQueueAbstract<K,T> implements CacheQueue<T>,HashConta
     @Override
     public T get(K k) {
         Node<T> node = linkedHashMap.get(k);
-        return node.getT();
+        if (node==null){
+            return null;
+        }else {
+            return node.getT();
+        }
     }
 
     @Override

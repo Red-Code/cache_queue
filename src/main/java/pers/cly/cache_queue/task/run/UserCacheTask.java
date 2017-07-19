@@ -1,5 +1,6 @@
 package pers.cly.cache_queue.task.run;
 
+import org.springframework.stereotype.Component;
 import pers.cly.cache_queue.cons.Global;
 import pers.cly.cache_queue.container.CacheQueue;
 import pers.cly.cache_queue.po.UserEntity;
@@ -18,6 +19,7 @@ import java.util.concurrent.TimeUnit;
  * 如果不为null,则查看队首元素是否到达过期时间，如果过期就出队，然后递归，继续查看下一个队首元素是否过期。
  * 如果队首元素没到过期时间，就设置定时线程，定时到该元素的过期时间再执行此任务。
  */
+@Component("userCacheTask")
 public class UserCacheTask implements Runnable{
     @Resource(name = "userEntityCache")
     private CacheQueue<UserEntity> cacheQueue;

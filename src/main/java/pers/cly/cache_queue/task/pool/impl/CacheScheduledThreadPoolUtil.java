@@ -1,5 +1,6 @@
 package pers.cly.cache_queue.task.pool.impl;
 
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import pers.cly.cache_queue.cons.Global;
 import pers.cly.cache_queue.task.pool.ScheduledThreadPoolUtil;
@@ -14,6 +15,8 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 public class CacheScheduledThreadPoolUtil implements ScheduledThreadPoolUtil {
     private static ScheduledThreadPoolExecutor cache_pool;
 
+    private static ApplicationContext applicationContext;
+
     @Override
     public void init() {
         //因为是初始化，所以先关闭一下现有线程，重新创建。
@@ -26,7 +29,7 @@ public class CacheScheduledThreadPoolUtil implements ScheduledThreadPoolUtil {
         cache_pool = new ScheduledThreadPoolExecutor(Global.pool_size);
 
         //创建定时任务
-        UserCacheTask userCacheTask = new UserCacheTask();
+        UserCacheTask userCacheTask = (UserCacheTask) applicationContext.getBean("userCacheTask");
 
         //创建定时线程任务，userCacheTask_time_value值，单位userCacheTask_time_unit，后执行一次
         cache_pool.schedule(userCacheTask,Global.userCacheTask_first_delay, Global.cache_time_unit);
@@ -43,6 +46,16 @@ public class CacheScheduledThreadPoolUtil implements ScheduledThreadPoolUtil {
         if (cache_pool!=null){
             cache_pool.shutdown();
         }
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
+    }
+
+    @Override
+    public ApplicationContext getApplicationContext() {
+        return applicationContext;
     }
 
     /**

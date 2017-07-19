@@ -17,6 +17,7 @@ public class ExtendContextLoaderListener extends ContextLoaderListener{
         //获取上下文
         ApplicationContext applicationContext = WebApplicationContextUtils.getWebApplicationContext(event.getServletContext());
         ScheduledThreadPoolUtil scheduledThreadPoolUtil = (ScheduledThreadPoolUtil) applicationContext.getBean("CacheScheduledThreadPoolUtil");
+        scheduledThreadPoolUtil.setApplicationContext(applicationContext);
         scheduledThreadPoolUtil.init();
     }
 

@@ -25,7 +25,7 @@ public interface HashContainer<K,T> {
     /**
      * 根据键值名提取元素
      * @param k
-     * @return
+     * @return 如果不存在该元素就返回null
      */
     T get(K k);
 

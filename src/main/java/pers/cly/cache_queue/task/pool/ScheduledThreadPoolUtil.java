@@ -1,5 +1,7 @@
 package pers.cly.cache_queue.task.pool;
 
+import org.springframework.context.ApplicationContext;
+
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 /**
@@ -25,4 +27,8 @@ public interface ScheduledThreadPoolUtil {
      * 销毁
      */
     void shutdown();
+
+    void setApplicationContext(ApplicationContext applicationContext);
+
+    ApplicationContext getApplicationContext();
 }
