@@ -4,6 +4,9 @@ package pers.cly.cache_queue.container;
  * Created by CLY on 2017/7/18.
  */
 
+import java.util.Calendar;
+import java.util.Date;
+
 /**
  * 提供队列的相关操作
  */
@@ -30,6 +33,12 @@ public interface CacheQueue<T> {
      * @return 队首元素
      */
     T front();
+
+    /**
+     * 读取队首元素的插入时间戳
+     * @return 插入时间戳
+     */
+    long frontTime();
 
     /**
      * 判断队列是否为空

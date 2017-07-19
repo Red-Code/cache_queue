@@ -9,4 +9,10 @@
        http://www.springframework.org/schema/util/spring-util-4.0.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
 	<context:component-scan base-package="pers.cly.cache_queue" />
+
+	<!--线程池，提供定时线程-->
+	<bean id="cacheScheduledThreadPoolUtil" class="pers.cly.cache_queue.task.pool.impl.CacheScheduledThreadPoolUtil"/>
+	<!--缓存容器-->
+	<bean id="userEntityCache" class="pers.cly.cache_queue.container.impl.UserEntityCache"/>
+	<!---->
 </beans>

@@ -5,6 +5,9 @@ import pers.cly.cache_queue.container.CacheQueue;
 import pers.cly.cache_queue.container.HashContainer;
 import pers.cly.cache_queue.po.UserEntity;
 
+import java.util.Calendar;
+import java.util.Date;
+
 /**
  * Created by CLY on 2017/7/18.
  */
@@ -44,6 +47,11 @@ public class UserEntityCache implements CacheQueue<UserEntity>,HashContainer<Lon
     @Override
     public UserEntity front() {
         return null;
+    }
+
+    @Override
+    public long frontTime() {
+        return 0;
     }
 
     @Override
