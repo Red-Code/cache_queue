@@ -6,6 +6,8 @@ package pers.cly.cache_queue.container;
 
 /**
  * 提供作为hash容器的操作
+ * @param <K> 用来查询的键值名（如果存放的为实体对象，一般设为id）
+ * @param <T>需要缓存的对象
  */
 public interface HashContainer<K,T> {
     /**

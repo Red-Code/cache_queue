@@ -4,12 +4,9 @@ package pers.cly.cache_queue.container;
  * Created by CLY on 2017/7/18.
  */
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.LinkedHashMap;
-
 /**
- * 提供队列的相关操作
+ * 提供队列的相关操作（不提供入队操作）
+ * @param <T> 队列中的缓存元素
  */
 public interface CacheQueue<T> {
     /**
