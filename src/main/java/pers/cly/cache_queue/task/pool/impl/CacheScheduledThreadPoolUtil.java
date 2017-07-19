@@ -25,7 +25,7 @@ public class CacheScheduledThreadPoolUtil implements ScheduledThreadPoolUtil {
         UserCacheTask userCacheTask = new UserCacheTask();
 
         //创建定时线程任务，userCacheTask_time_value值，单位userCacheTask_time_unit，后执行一次
-        cache_pool.schedule(userCacheTask,Global.userCacheTask_first_delay, Global.userCacheTask_first_unit);
+        cache_pool.schedule(userCacheTask,Global.userCacheTask_first_delay, Global.cache_time_unit);
 
     }
 

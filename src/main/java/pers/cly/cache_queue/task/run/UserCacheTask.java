@@ -1,19 +1,14 @@
 package pers.cly.cache_queue.task.run;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.Scope;
+import com.sun.org.apache.bcel.internal.generic.BREAKPOINT;
 import pers.cly.cache_queue.cons.Global;
 import pers.cly.cache_queue.container.CacheQueue;
 import pers.cly.cache_queue.po.UserEntity;
 import pers.cly.cache_queue.task.pool.ScheduledThreadPoolUtil;
 
 import javax.annotation.Resource;
-import javax.print.attribute.standard.MediaSize;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
-
-import static java.text.DateFormat.Field.MINUTE;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by CLY on 2017/7/14.
@@ -33,31 +28,63 @@ public class UserCacheTask implements Runnable{
      */
     @Override
     public void run() {
+        checkDelay();
+    }
+
+    private void checkDelay(){
         ScheduledThreadPoolExecutor scheduledThreadPoolExecutor = scheduledThreadPoolUtil.getThreadPool();
 
         if (cacheQueue.isEmpty()){
-            scheduledThreadPoolExecutor.schedule(this, Global.userCacheTask_null_delay,Global.userCacheTask_null_unit);
+            scheduledThreadPoolExecutor.schedule(this, Global.userCacheTask_null_delay,Global.cache_time_unit);
         }else {
+            long delay_time = calculationDelayTime(cacheQueue.frontTime());
+            long now_time = System.currentTimeMillis();
+
+            //距离过期的时间：若果结果为0或负数，则表示该值过期了，否则表示还没过期
+            long distance_delay_time = delay_time - now_time;
+            //"距离过期时间"小于1分钟的元素，都出队，否则设定下次的定时出队线程任务
+            if (distance_delay_time<=60000){
+                cacheQueue.out();
+                checkDelay();
+            }else {
+                //距离当前队首元素过期时间distance_delay_time后，再次执行该任务，出掉它
+                scheduledThreadPoolExecutor.schedule(this,distance_delay_time, TimeUnit.NANOSECONDS);
+            }
         }
     }
 
-    public static void main(String[] arg){
-        long now = new Date().getTime();
-        long now2 = new Date().getTime()-1;
+    /**
+     * 计算过期时间并返回
+     * @param insert_time 原时间
+     * @return 应该到期的时间
+     */
+    private long calculationDelayTime(long insert_time){
+        long delay_time = 0;
+        //将延迟时间计算成时间戳
+        switch (Global.cache_time_unit){
+            case NANOSECONDS:
+                delay_time = Global.userCacheTime;
+                break;
+            case MICROSECONDS:
+                delay_time = Global.userCacheTime*10;
+                break;
+            case MILLISECONDS:
+                delay_time = Global.userCacheTime*100;
+                break;
+            case SECONDS:
+                delay_time = Global.userCacheTime*1000;
+                break;
+            case MINUTES:
+                delay_time = Global.userCacheTime*60000;
+                break;
+            case HOURS:
+                delay_time = Global.userCacheTime*3600000;
+                break;
+            case DAYS:
+                delay_time = Global.userCacheTime*86400000;
+                break;
+        }
 
-        long k = now-now2;
-        System.out.println(k);
-
-//        UserCacheTask demo = new UserCacheTask();
-//        demo.run();
-//        long now = new Date().getTime();
-//        System.out.println(now);
-////        System.out.println((int) now);
-//        long startTime11 = System.currentTimeMillis();//获取当前时间
-//        for (int i=0;i<999999999;i++){
-//
-//        }
-//        long endTime11 = System.currentTimeMillis();
-//        System.out.println("运行时间："+(endTime11-startTime11)+"ms");
+        return insert_time+delay_time;
     }
 }
