@@ -6,6 +6,7 @@ package pers.cly.cache_queue.container;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.LinkedHashMap;
 
 /**
  * 提供队列的相关操作
@@ -15,12 +16,6 @@ public interface CacheQueue<T> {
      * 初始化队列
      */
     void init();
-
-    /**
-     * 插入一个元素到队列尾部
-     * @param t
-     */
-    void in(T t);
 
     /**
      * 删除队首元素，并返回其值
@@ -38,7 +33,7 @@ public interface CacheQueue<T> {
      * 读取队首元素的插入时间戳
      * @return 插入时间戳
      */
-    long frontTime();
+    Long frontTime();
 
     /**
      * 判断队列是否为空

@@ -25,7 +25,7 @@ public interface HashContainer<K,T> {
      * @param k
      * @return
      */
-    T put(K k);
+    T get(K k);
 
     /**
      * 根据键名删除元素
