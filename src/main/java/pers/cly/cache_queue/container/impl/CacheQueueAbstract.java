@@ -3,6 +3,7 @@ package pers.cly.cache_queue.container.impl;
 import pers.cly.cache_queue.container.CacheQueue;
 import pers.cly.cache_queue.container.HashContainer;
 
+import java.lang.ref.SoftReference;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -18,13 +19,13 @@ import java.util.Map;
  */
 public abstract class CacheQueueAbstract<K,T> implements CacheQueue<T>,HashContainer<K,T> {
 
-    LinkedHashMap<K,Node<T>> linkedHashMap;
+    LinkedHashMap<K,SoftReference<Node<T>>> linkedHashMap;
 
     /**
      * 构造方法，初始化LinkedHashMap
      */
     public CacheQueueAbstract(){
-        linkedHashMap = new LinkedHashMap<K, Node<T>>();
+        linkedHashMap = new LinkedHashMap<K,SoftReference<Node<T>>>();
     }
 
     @Override
@@ -35,14 +36,14 @@ public abstract class CacheQueueAbstract<K,T> implements CacheQueue<T>,HashConta
     @Override
     public void set(K k, T t) {
         long now_time = System.currentTimeMillis();
-        Node node = new Node(t,now_time);//连同时间戳一起装入节点，然后装入容器。
-
-        linkedHashMap.put(k,node);
+        Node<T> node = new Node(t,now_time);//连同时间戳一起装入节点，然后装入容器。
+        SoftReference<Node<T>> nodeRefer = new SoftReference (node);//此处使用软引用，当内存不够用时，会将其回收
+        linkedHashMap.put(k,nodeRefer);
     }
 
     @Override
     public T get(K k) {
-        Node<T> node = linkedHashMap.get(k);
+        Node<T> node = linkedHashMap.get(k).get();
         if (node==null){
             return null;
         }else {
@@ -60,7 +61,7 @@ public abstract class CacheQueueAbstract<K,T> implements CacheQueue<T>,HashConta
         Iterator<K> it = linkedHashMap.keySet().iterator();
         if (it.hasNext()){
             K key = it.next();
-            Node<T> re = linkedHashMap.remove(key);
+            Node<T> re = linkedHashMap.remove(key).get();
             return re.getT();
         }else {
             return null;
@@ -69,9 +70,9 @@ public abstract class CacheQueueAbstract<K,T> implements CacheQueue<T>,HashConta
 
     @Override
     public T front() {
-        Iterator<Map.Entry<K, Node<T>>> it = linkedHashMap.entrySet().iterator();
+        Iterator<Map.Entry<K, SoftReference<Node<T>>>> it = linkedHashMap.entrySet().iterator();
         if (it.hasNext()){
-            return it.next().getValue().getT();
+            return it.next().getValue().get().getT();
         }else {
             return null;
         }
@@ -79,9 +80,9 @@ public abstract class CacheQueueAbstract<K,T> implements CacheQueue<T>,HashConta
 
     @Override
     public Long frontTime() {
-        Iterator<Map.Entry<K, Node<T>>> it = linkedHashMap.entrySet().iterator();
+        Iterator<Map.Entry<K, SoftReference<Node<T>>>> it = linkedHashMap.entrySet().iterator();
         if (it.hasNext()){
-            return it.next().getValue().getTime();
+            return it.next().getValue().get().getTime();
         }else {
             return null;
         }
