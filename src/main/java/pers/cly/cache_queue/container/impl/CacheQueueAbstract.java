@@ -4,9 +4,8 @@ import pers.cly.cache_queue.container.CacheQueue;
 import pers.cly.cache_queue.container.HashContainer;
 
 import java.lang.ref.SoftReference;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * Created by CLY on 2017/7/19.
@@ -19,31 +18,28 @@ import java.util.Map;
  */
 public abstract class CacheQueueAbstract<K,T> implements CacheQueue<T>,HashContainer<K,T> {
 
-    LinkedHashMap<K,SoftReference<Node<T>>> linkedHashMap;
-
-    /**
-     * 构造方法，初始化LinkedHashMap
-     */
-    public CacheQueueAbstract(){
-        linkedHashMap = new LinkedHashMap<K,SoftReference<Node<T>>>();
-    }
+    ConcurrentHashMap<K,SoftReference<Node<K,T>>> concurrentHashMap = new ConcurrentHashMap<K, SoftReference<Node<K,T>>>();
+    ConcurrentLinkedQueue<SoftReference<Node<K,T>>> concurrentLinkedQueue = new ConcurrentLinkedQueue<SoftReference<Node<K,T>>>();
 
     @Override
     public void init() {
-        linkedHashMap.clear();
+        concurrentHashMap.clear();
+        concurrentLinkedQueue.clear();
     }
 
     @Override
-    public void set(K k, T t) {
+    public void put(K k, T t) {
         long now_time = System.currentTimeMillis();
-        Node<T> node = new Node(t,now_time);//连同时间戳一起装入节点，然后装入容器。
-        SoftReference<Node<T>> nodeRefer = new SoftReference (node);//此处使用软引用，当内存不够用时，会将其回收
-        linkedHashMap.put(k,nodeRefer);
+        Node<K,T> node = new Node(k,t,now_time);//连同时间戳一起装入节点，然后装入容器。
+        SoftReference<Node<K,T>> nodeRefer = new SoftReference (node);//此处使用软引用，当内存不够用时，会将其回收
+
+        concurrentHashMap.put(k,nodeRefer);
+        concurrentLinkedQueue.add(nodeRefer);
     }
 
     @Override
     public T get(K k) {
-        Node<T> node = linkedHashMap.get(k).get();
+        Node<K,T> node = concurrentHashMap.get(k).get();
         if (node==null){
             return null;
         }else {
@@ -52,63 +48,69 @@ public abstract class CacheQueueAbstract<K,T> implements CacheQueue<T>,HashConta
     }
 
     @Override
-    public void del(K k) {
-        linkedHashMap.remove(k);
-    }
-
-    @Override
     public T out() {
-        Iterator<K> it = linkedHashMap.keySet().iterator();
-        if (it.hasNext()){
-            K key = it.next();
-            Node<T> re = linkedHashMap.remove(key).get();
-            return re.getT();
-        }else {
+        //获取并移除头元素（如果队列为空则返回null）
+        SoftReference<Node<K,T>> head = concurrentLinkedQueue.poll();
+        if (head==null){
             return null;
+        }else {
+            concurrentHashMap.remove(head.get().getKey());
+            return head.get().getT();
         }
     }
 
     @Override
     public T front() {
-        Iterator<Map.Entry<K, SoftReference<Node<T>>>> it = linkedHashMap.entrySet().iterator();
-        if (it.hasNext()){
-            return it.next().getValue().get().getT();
-        }else {
+        SoftReference<Node<K,T>> head = concurrentLinkedQueue.peek();
+        if (head==null){
             return null;
+        }else {
+            return head.get().getT();
         }
     }
 
     @Override
     public Long frontTime() {
-        Iterator<Map.Entry<K, SoftReference<Node<T>>>> it = linkedHashMap.entrySet().iterator();
-        if (it.hasNext()){
-            return it.next().getValue().get().getTime();
-        }else {
+        SoftReference<Node<K,T>> head = concurrentLinkedQueue.peek();
+        if (head==null){
             return null;
+        }else {
+            return head.get().getTime();
         }
     }
 
     @Override
     public boolean isEmpty() {
-        return linkedHashMap.isEmpty();
+        return concurrentHashMap.isEmpty();
     }
 
     @Override
     public int getSize() {
-        return linkedHashMap.size();
+        //此处不要使用concurrentLinkedQueue.size()，因为这个方法会遍历整个集合
+        return concurrentHashMap.size();
     }
 
     /**
      * linkedhashmap键值节点，负责保存数据与插入时间
-     * @param <T>
+     * @param <K,T>
      */
-    class Node<T>{
+    class Node<K,T>{
         T t;//存储实体
         long time;//存储入队时间戳
+        K key;//该节点在hashmap中所对应的键值名
 
-        public Node(T t,long time){
+        public Node(K key,T t,long time){
+            this.key = key;
             this.t = t;
             this.time = time;
+        }
+
+        public K getKey() {
+            return key;
+        }
+
+        public void setKey(K key) {
+            this.key = key;
         }
 
         public T getT() {

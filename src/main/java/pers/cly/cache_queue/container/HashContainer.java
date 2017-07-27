@@ -20,7 +20,7 @@ public interface HashContainer<K,T> {
      * @param k
      * @param t
      */
-    void set(K k,T t);
+    void put(K k, T t);
 
     /**
      * 根据键值名提取元素
@@ -30,10 +30,11 @@ public interface HashContainer<K,T> {
     T get(K k);
 
     /**
+     * （暂时不提供该方法）
      * 根据键名删除元素
      * @param k
      */
-    void del(K k);
+//    void del(K k);
 
     /**
      * 判断容器大小
