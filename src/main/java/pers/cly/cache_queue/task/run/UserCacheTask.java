@@ -2,7 +2,7 @@ package pers.cly.cache_queue.task.run;
 
 import org.springframework.stereotype.Component;
 import pers.cly.cache_queue.cons.Global;
-import pers.cly.cache_queue.container.CacheQueue;
+import pers.cly.cache_queue.DEL.CacheQueue;
 import pers.cly.cache_queue.po.UserEntity;
 import pers.cly.cache_queue.task.pool.ScheduledThreadPoolUtil;
 

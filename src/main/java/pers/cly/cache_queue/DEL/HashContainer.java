@@ -1,4 +1,4 @@
-package pers.cly.cache_queue.container;
+package pers.cly.cache_queue.DEL;
 
 /**
  * Created by CLY on 2017/7/18.

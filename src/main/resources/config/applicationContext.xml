@@ -13,7 +13,7 @@
 	<!--线程池，提供定时线程-->
 	<bean id="cacheScheduledThreadPoolUtil" class="pers.cly.cache_queue.task.pool.impl.CacheScheduledThreadPoolUtil"/>
 	<!--缓存容器-->
-	<bean id="userEntityCache" class="pers.cly.cache_queue.container.impl.UserEntityCache"/>
+	<bean id="userEntityCache" class="pers.cly.cache_queue.DEL.UserEntityCache"/>
 	<!--任务类-->
 	<bean id="userCacheTask" class="pers.cly.cache_queue.task.run.UserCacheTask"/>
 </beans>
